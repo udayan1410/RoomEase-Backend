@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const userSchema = (
     {
         userName: {
-            type: String
+            type: String,
         },
 
         email: {
@@ -22,7 +22,7 @@ const userSchema = (
         },
 
         roomid: {
-            type: Schema.Types.ObjectId, ref: 'Room',
+            type: Schema.Types.ObjectId, ref: 'RoomModel',
         }
 
     }
