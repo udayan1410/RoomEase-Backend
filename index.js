@@ -15,8 +15,8 @@ app.use('/profile', profileRoutes);
 app.post('/signup', async (req, res) => {
     try {
         let previousUsers = await User.find({ email: req.body.email });
-        let responseObj = { "Result ": "Not Done" }
-
+        console.log(previousUsers);
+        let responseObj = { "Result ": "Already a user." }
         if (previousUsers.length == 0) {
             let user = new User({ ...req.body });
             await user.save();
@@ -30,13 +30,25 @@ app.post('/signup', async (req, res) => {
     }
 })
 
+app.post('/login', async(req, res)=>{
+    try {
+        let previousUsers = await User.find({email: req.body.email, password: req.body.password, userName: req.body.userName });
+        let responseObj = { "Result" : "User not authorized." };
+        if (previousUsers.length == 1 ) {
+            responseObj.Result = "User is authorized!!";
+            res.send(responseObj);
+        }
+        else res.send(responseObj);
+    }
+    catch(error) {
+        console.log(error);
+        res.send("Error: ",error)
+    }
+})
+
 
 mongoose.connect('mongodb://127.0.0.1:27017/RoomEase', { useUnifiedTopology: true, useNewUrlParser: true }, () => {
     app.listen(8080, () => {
         console.log("Server started on 8080");
     })
 })
-
-
-
-
