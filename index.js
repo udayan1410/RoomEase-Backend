@@ -20,7 +20,7 @@ app.post('/signup', async (req, res) => {
         let responseObj = { "Result": "Fail", "Error": "User Exists" }
 
         if (previousUsers.length == 0) {
-            let user = new User({ ...req.body });
+            let user = new User({ ...req.body, roomid: null });
             await user.save();
             responseObj['Result'] = "Success";
             responseObj['Error'] = null;

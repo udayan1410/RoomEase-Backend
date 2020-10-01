@@ -51,5 +51,39 @@ router.post('/join', async (req, res, next) => {
 });
 
 
+router.post('/leave', async (req, res, next) => {
+    let { userID, roomName } = req.body;
+    const responseObj = { "Result": "Fail", Error: "Room not found" }
+
+    let user = await User.findById(userID);
+    if (user) {
+        let room = (await RoomModel.find({ roomName: roomName }))[0];
+
+        if (room && room['members'].includes(userID)) {
+            let { members, _id } = room;
+
+            members.splice(members.indexOf(userID), 1);
+            room['members'] = members;
+
+            user.roomid = null;
+
+            await room.save();
+            await user.save();
+
+            responseObj['Result'] = "Success";
+            responseObj['Error'] = null;
+        }
+        else
+            responseObj['Error'] = "User not in the room";
+
+    }
+
+    else
+        responseObj['Error'] = "User not found";
+
+    res.send(responseObj);
+});
+
+
 
 module.exports = router;
