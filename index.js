@@ -31,7 +31,35 @@ app.post('/signup', async (req, res) => {
     } catch (err) {
         console.log("Error [POST /signup] ", err.message);
         res.send({ "Result": err.message })
+    }
+})
 
+app.post('/login', async(req, res)=>{
+    try {
+        let previousUsers = await User.find({email: req.body.email, password: req.body.password });
+        let responseObj = { "Result" : "Fail", "Error": "User not authorized" };
+        let obj;
+        if (previousUsers.length == 1 ) {
+            responseObj.Result = "Success";
+            responseObj.Error = null;
+
+            let {email,userName,_id,roomid,phoneNumber} = previousUsers[0];
+            obj = {
+                email : email,
+                userName : userName,
+                _id : _id,
+                roomid : roomid,
+                phoneNumber : phoneNumber
+            }
+        }
+        res.send({
+            responseObj,
+            user:{...obj}
+        });
+    }
+    catch(error) {
+        console.log(error);
+        res.send("Error: ",error)
     }
 })
 
