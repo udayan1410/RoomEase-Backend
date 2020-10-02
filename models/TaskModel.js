@@ -12,11 +12,18 @@ const taskmodel = (
             days: [],
             timeOfDay: [],
             users: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-            names: []
         },
 
         comments: {
             type: String,
+        },
+
+        createdOn: {
+            type: Date,
+        },
+
+        status: {
+            type: String
         }
 
     }

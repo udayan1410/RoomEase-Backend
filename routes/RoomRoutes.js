@@ -12,7 +12,6 @@ router.post('/create', async (req, res, next) => {
     let room = (await RoomModel.find({ roomName: roomName }))[0];
 
     if (!room) {
-
         let user = (await User.findById(userID));
 
         if (user) {
@@ -112,9 +111,14 @@ router.get('/members', async (req, res, next) => {
 
     let room = (await RoomModel.find({ roomName: roomName }))[0];
     if (room) {
+
+        let memberIds = [...room['members']];
+
+        let users = (await User.find().where('_id').in(memberIds).select("userName email roomid"));
+
         responseObj['Result'] = "Success";
         responseObj['Error'] = null;
-        responseObj['Members'] = [...room['members']];
+        responseObj['Members'] = [users];
     }
 
     res.send(responseObj)
