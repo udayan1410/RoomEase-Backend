@@ -11,6 +11,16 @@ const app = express();
 
 app.use(bodyParser.json());
 
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader(
+        'Access-Control-Allow-Methods',
+        'OPTIONS, GET, POST, PUT, PATCH, DELETE'
+    );
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    next();
+});
+
 app.use('/profile', profileRoutes);
 app.use('/room', roomRoutes);
 app.use('/task', taskRoutes);
@@ -19,7 +29,7 @@ app.use('/task', taskRoutes);
 app.post('/signup', async (req, res) => {
     try {
         let previousUsers = await User.find({ email: req.body.email });
-        let responseObj = { "Result": "Fail", "Error": "User Exists" }
+        let responseObject = { "Result": "Fail", "Error": "User Exists" }
 
         if (previousUsers.length == 0) {
             let userNameExists = await User.findOne({ userName: req.body.userName });
@@ -27,14 +37,14 @@ app.post('/signup', async (req, res) => {
             if (!userNameExists) {
                 let user = new User({ ...req.body, roomid: null });
                 await user.save();
-                responseObj['Result'] = "Success";
-                responseObj['Error'] = null;
+                responseObject['Result'] = "Success";
+                responseObject['Error'] = null;
             }
 
-            responseObj['Error'] = "Username exists";
+            responseObject['Error'] = "Username exists";
         }
 
-        res.send(responseObj);
+        res.send(responseObject);
 
     } catch (err) {
         console.log("Error [POST /signup] ", err.message);
@@ -45,11 +55,11 @@ app.post('/signup', async (req, res) => {
 app.post('/login', async (req, res) => {
     try {
         let previousUsers = await User.find({ email: req.body.email, password: req.body.password });
-        let responseObj = { "Result": "Fail", "Error": "User not authorized" };
+        let responseObject = { "Result": "Fail", "Error": "User not authorized" };
         let obj;
         if (previousUsers.length == 1) {
-            responseObj.Result = "Success";
-            responseObj.Error = null;
+            responseObject.Result = "Success";
+            responseObject.Error = null;
 
             let { email, userName, _id, roomid, phoneNumber } = previousUsers[0];
             obj = {
@@ -61,7 +71,7 @@ app.post('/login', async (req, res) => {
             }
         }
         res.send({
-            responseObj,
+            responseObject,
             user: { ...obj }
         });
     }

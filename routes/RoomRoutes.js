@@ -3,9 +3,9 @@ const router = express.Router();
 const RoomModel = require('../models/RoomModel');
 const User = require('../models/User');
 
-
+//input : Roomname and userid
 router.post('/create', async (req, res, next) => {
-    let responseObj = { "Result": "Fail", "Error": "Room Exists" }
+    let responseObject = { "Result": "Fail", "Error": "Room Exists" }
 
     let { userID, roomName } = req.body;
 
@@ -23,27 +23,28 @@ router.post('/create', async (req, res, next) => {
             await roomModel.save();
             await user.save();
 
-            responseObj['Result'] = 'Success';
-            responseObj['Error'] = null;
-            responseObj['Roomdata'] = {
+            responseObject['Result'] = 'Success';
+            responseObject['Error'] = null;
+            responseObject['Roomdata'] = {
                 roomName: roomName,
                 roomid: user.roomid
             }
         }
 
         else {
-            responseObj['Result'] = 'Fail';
-            responseObj['Error'] = "User not found";
+            responseObject['Result'] = 'Fail';
+            responseObject['Error'] = "User not found";
         }
     }
 
-    res.send(responseObj)
+    res.send(responseObject)
 });
 
 
+//input = roomname and userid
 router.post('/join', async (req, res, next) => {
     let { userID, roomName } = req.body;
-    const responseObj = { "Result": "Fail", Error: "Room not found" }
+    const responseObject = { "Result": "Fail", Error: "Room not found" }
 
     let user = await User.findById(userID);
 
@@ -60,22 +61,22 @@ router.post('/join', async (req, res, next) => {
             await room.save();
             await user.save();
 
-            responseObj['Result'] = "Success";
-            responseObj['Error'] = null;
+            responseObject['Result'] = "Success";
+            responseObject['Error'] = null;
         }
         else
-            responseObj['Error'] = "User already exists in room";
+            responseObject['Error'] = "User already exists in room";
 
     } else
-        responseObj['Error'] = "User not found";
+        responseObject['Error'] = "User not found";
 
-    res.send(responseObj);
+    res.send(responseObject);
 });
 
-
+// input  = roomname and user id
 router.post('/leave', async (req, res, next) => {
     let { userID, roomName } = req.body;
-    const responseObj = { "Result": "Fail", Error: "Room not found" }
+    const responseObject = { "Result": "Fail", Error: "Room not found" }
 
     let user = await User.findById(userID);
     if (user) {
@@ -92,21 +93,21 @@ router.post('/leave', async (req, res, next) => {
             await room.save();
             await user.save();
 
-            responseObj['Result'] = "Success";
-            responseObj['Error'] = null;
+            responseObject['Result'] = "Success";
+            responseObject['Error'] = null;
         }
         else
-            responseObj['Error'] = "User not in the room";
+            responseObject['Error'] = "User not in the room";
     }
     else
-        responseObj['Error'] = "User not found";
+        responseObject['Error'] = "User not found";
 
-    res.send(responseObj);
+    res.send(responseObject);
 });
 
-
+// input = request query = roomname
 router.get('/members', async (req, res, next) => {
-    const responseObj = { "Result": "Fail", Error: "Room not found" }
+    const responseObject = { "Result": "Fail", Error: "Room not found" }
     let roomName = req.query.roomname;
 
     let room = (await RoomModel.find({ roomName: roomName }))[0];
@@ -116,26 +117,27 @@ router.get('/members', async (req, res, next) => {
 
         let users = (await User.find().where('_id').in(memberIds).select("userName email roomid"));
 
-        responseObj['Result'] = "Success";
-        responseObj['Error'] = null;
-        responseObj['Members'] = [users];
+        responseObject['Result'] = "Success";
+        responseObject['Error'] = null;
+        responseObject['Members'] = [users];
     }
 
-    res.send(responseObj)
+    res.send(responseObject)
 })
 
+// input = request query = roomname
 router.get('/tasks', async (req, res, next) => {
-    const responseObj = { "Result": "Fail", Error: "Room not found" }
+    const responseObject = { "Result": "Fail", Error: "Room not found" }
     let roomName = req.query.roomname;
 
     let room = (await RoomModel.find({ roomName: roomName }))[0];
     if (room) {
-        responseObj['Result'] = "Success";
-        responseObj['Error'] = null;
-        responseObj['Tasks'] = [...room['tasks']];
+        responseObject['Result'] = "Success";
+        responseObject['Error'] = null;
+        responseObject['Tasks'] = [...room['tasks']];
     }
 
-    res.send(responseObj)
+    res.send(responseObject)
 })
 
 
