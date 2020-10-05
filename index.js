@@ -16,10 +16,11 @@ app.use('/room', roomRoutes);
 
 app.post('/signup', async (req, res) => {
     try {
-        let previousUsers = await User.find({ email: req.body.email });
+        let previousMail = await User.find({ email: req.body.email });
+        let previousUserName = await User.find({ userName: req.body.userName });
         let responseObj = { "Result": "Fail", "Error": "User Exists" }
 
-        if (previousUsers.length == 0) {
+        if (previousUserName.length == 0 && previousMail.length == 0) {
             let user = new User({ ...req.body, roomid: null });
             await user.save();
             responseObj['Result'] = "Success";
