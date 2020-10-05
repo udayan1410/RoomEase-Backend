@@ -39,7 +39,7 @@ app.post('/signup', async (req, res) => {
             responseObj['Error'] = null;
         }
 
-        res.send(responseObject);
+        res.send(responseObj);
 
     } catch (err) {
         console.log("Error [POST /signup] ", err.message);

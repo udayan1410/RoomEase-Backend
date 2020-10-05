@@ -5,39 +5,48 @@ const User = require('../models/User');
 
 //input : Roomname and userid
 router.post('/create', async (req, res, next) => {
+
     let responseObject = { "Result": "Fail", "Error": "Room Exists" }
 
-    let { userID, roomName } = req.body;
+    try {
 
-    let room = (await RoomModel.find({ roomName: roomName }))[0];
+        let { userID, roomName } = req.body;
 
-    if (!room) {
-        let user = (await User.findById(userID));
+        let room = (await RoomModel.find({ roomName: roomName }))[0];
 
-        if (user) {
-            let roomModel = new RoomModel({ roomName: roomName });
-            roomModel['members'].push(userID);
+        if (!room) {
+            let user = (await User.findById(userID));
 
-            user.roomid = roomModel._id;
+            if (user && user.roomid == null) {
+                let roomModel = new RoomModel({ roomName: roomName });
+                roomModel['members'].push(userID);
 
-            await roomModel.save();
-            await user.save();
+                user.roomid = roomModel._id;
 
-            responseObject['Result'] = 'Success';
-            responseObject['Error'] = null;
-            responseObject['Roomdata'] = {
-                roomName: roomName,
-                roomid: user.roomid
+                await roomModel.save();
+                await user.save();
+
+                responseObject['Result'] = 'Success';
+                responseObject['Error'] = null;
+                responseObject['Roomdata'] = {
+                    roomName: roomName,
+                    roomid: user.roomid
+                }
+            }
+
+            else {
+                responseObject['Result'] = 'Fail';
+                responseObject['Error'] = "User Already in a room";
             }
         }
 
-        else {
-            responseObject['Result'] = 'Fail';
-            responseObject['Error'] = "User not found";
-        }
+        res.send(responseObject)
+    }
+    catch (err) {
+        responseObject.Error = "Something went wrong";
+        res.send(responseObject)
     }
 
-    res.send(responseObject)
 });
 
 
