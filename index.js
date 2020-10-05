@@ -28,20 +28,15 @@ app.use('/task', taskRoutes);
 
 app.post('/signup', async (req, res) => {
     try {
-        let previousUsers = await User.find({ email: req.body.email });
-        let responseObject = { "Result": "Fail", "Error": "User Exists" }
+        let previousMail = await User.find({ email: req.body.email });
+        let previousUserName = await User.find({ userName: req.body.userName });
+        let responseObj = { "Result": "Fail", "Error": "User Exists" }
 
-        if (previousUsers.length == 0) {
-            let userNameExists = await User.findOne({ userName: req.body.userName });
-
-            if (!userNameExists) {
-                let user = new User({ ...req.body, roomid: null });
-                await user.save();
-                responseObject['Result'] = "Success";
-                responseObject['Error'] = null;
-            }
-
-            responseObject['Error'] = "Username exists";
+        if (previousUserName.length == 0 && previousMail.length == 0) {
+            let user = new User({ ...req.body, roomid: null });
+            await user.save();
+            responseObj['Result'] = "Success";
+            responseObj['Error'] = null;
         }
 
         res.send(responseObject);
