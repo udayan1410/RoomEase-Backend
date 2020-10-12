@@ -116,7 +116,9 @@ router.post('/leave', async (req, res, next) => {
 
 // input = request query = roomname
 router.get('/members', async (req, res, next) => {
+
     const responseObject = { "Result": "Fail", Error: "Room not found" }
+
     let roomName = req.query.roomname;
 
     let room = (await RoomModel.find({ roomName: roomName }))[0];
@@ -128,7 +130,7 @@ router.get('/members', async (req, res, next) => {
 
         responseObject['Result'] = "Success";
         responseObject['Error'] = null;
-        responseObject['Members'] = [users];
+        responseObject['Members'] = [...users];
     }
 
     res.send(responseObject)

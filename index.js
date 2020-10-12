@@ -49,20 +49,20 @@ app.post('/signup', async (req, res) => {
 
 app.post('/login', async (req, res) => {
     try {
-        let previousUsers = await User.find({ email: req.body.email, password: req.body.password });
+        let previousUsers = await User.find({ email: req.body.email, password: req.body.password }).select("userName _id").populate("roomid");
         let responseObject = { "Result": "Fail", "Error": "User not authorized" };
         let obj;
+        // console.log(previousUsers);
         if (previousUsers.length == 1) {
             responseObject.Result = "Success";
             responseObject.Error = null;
 
-            let { email, userName, _id, roomid, phoneNumber } = previousUsers[0];
+            let { userName, _id, roomid } = previousUsers[0];
             obj = {
-                email: email,
                 userName: userName,
                 _id: _id,
-                roomid: roomid,
-                phoneNumber: phoneNumber
+                roomid: roomid ? roomid._id : null,
+                roomName: roomid ? roomid.roomName : null
             }
         }
         res.send({

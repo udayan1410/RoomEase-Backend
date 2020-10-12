@@ -3,7 +3,7 @@ const router = express.Router();
 const Task = require('../models/TaskModel');
 const RoomModel = require('../models/RoomModel');
 const User = require('../models/User');
-
+const Constants = require('../contants');
 
 // All task model data and roomname
 router.post('/create', async (req, res, next) => {
@@ -14,7 +14,13 @@ router.post('/create', async (req, res, next) => {
     let room = (await RoomModel.find({ roomName: roomName }))[0];
 
     if (room) {
-        let task = new Task({ taskName, columns, comments, status: "incomplete", createdOn })
+        let taskStatus = [];
+
+        for (let user in columns.users)
+            taskStatus.push(Constants.ASSIGNED);
+
+        columns.taskStatus = taskStatus;
+        let task = new Task({ taskName, columns, comments, createdOn })
 
         let users = (await User.find().where('_id').in(task.columns.users));
 
