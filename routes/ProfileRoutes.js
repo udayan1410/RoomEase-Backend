@@ -9,7 +9,8 @@ router.get('/', (req, res, next) => {
     })
 })
 
-router.post('/', (req, res, next) => {
+router.post('/:id', (req, res, next) => {
+
     let user = new User({ ...req.body });
     res.send(user)
 })
