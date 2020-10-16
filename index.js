@@ -3,7 +3,7 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var profileRoutes = require('./routes/ProfileRoutes');
 var roomRoutes = require('./routes/RoomRoutes');
-
+var taskRoutes = require('./routes/TaskRoutes');
 const User = require('./models/User');
 
 
@@ -11,15 +11,28 @@ const app = express();
 
 app.use(bodyParser.json());
 
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader(
+        'Access-Control-Allow-Methods',
+        'OPTIONS, GET, POST, PUT, PATCH, DELETE'
+    );
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    next();
+});
+
 app.use('/profile', profileRoutes);
 app.use('/room', roomRoutes);
+app.use('/task', taskRoutes);
+
 
 app.post('/signup', async (req, res) => {
     try {
-        let previousUsers = await User.find({ email: req.body.email });
+        let previousMail = await User.find({ email: req.body.email });
+        let previousUserName = await User.find({ userName: req.body.userName });
         let responseObj = { "Result": "Fail", "Error": "User Exists" }
 
-        if (previousUsers.length == 0) {
+        if (previousUserName.length == 0 && previousMail.length == 0) {
             let user = new User({ ...req.body, roomid: null });
             await user.save();
             responseObj['Result'] = "Success";
@@ -34,32 +47,32 @@ app.post('/signup', async (req, res) => {
     }
 })
 
-app.post('/login', async(req, res)=>{
+app.post('/login', async (req, res) => {
     try {
-        let previousUsers = await User.find({email: req.body.email, password: req.body.password });
-        let responseObj = { "Result" : "Fail", "Error": "User not authorized" };
+        let previousUsers = await User.find({ email: req.body.email, password: req.body.password }).select("userName _id").populate("roomid");
+        let responseObject = { "Result": "Fail", "Error": "User not authorized" };
         let obj;
-        if (previousUsers.length == 1 ) {
-            responseObj.Result = "Success";
-            responseObj.Error = null;
+        // console.log(previousUsers);
+        if (previousUsers.length == 1) {
+            responseObject.Result = "Success";
+            responseObject.Error = null;
 
-            let {email,userName,_id,roomid,phoneNumber} = previousUsers[0];
+            let { userName, _id, roomid } = previousUsers[0];
             obj = {
-                email : email,
-                userName : userName,
-                _id : _id,
-                roomid : roomid,
-                phoneNumber : phoneNumber
+                userName: userName,
+                _id: _id,
+                roomid: roomid ? roomid._id : null,
+                roomName: roomid ? roomid.roomName : null
             }
         }
         res.send({
-            responseObj,
-            user:{...obj}
+            responseObject,
+            user: { ...obj }
         });
     }
-    catch(error) {
+    catch (error) {
         console.log(error);
-        res.send("Error: ",error)
+        res.send("Error: ", error)
     }
 })
 

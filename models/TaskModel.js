@@ -9,16 +9,19 @@ const taskmodel = (
         },
 
         columns: {
-            days: [],
-            timeOfDay: [],
+            daysOfTheWeek: [],
+            timeOfDay: String,
             users: [{ type: Schema.Types.ObjectId, ref: 'User' }],
-            names: []
+            taskStatus: [],
         },
 
         comments: {
             type: String,
-        }
+        },
 
+        createdOn: {
+            type: String,
+        }
     }
 )
 

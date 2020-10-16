@@ -23,7 +23,11 @@ const userSchema = (
 
         roomid: {
             type: Schema.Types.ObjectId, ref: 'RoomModel',
-        }
+        },
+
+        tasks: [{
+            type: Schema.Types.ObjectId, ref: 'TaskModel',
+        }]
 
     }
 );
