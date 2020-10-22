@@ -5,10 +5,11 @@ var profileRoutes = require('./routes/ProfileRoutes');
 var roomRoutes = require('./routes/RoomRoutes');
 var taskRoutes = require('./routes/TaskRoutes');
 const User = require('./models/User');
+var path = require('path')
 
 
 const app = express();
-
+app.use(express.static('public'));
 app.use(bodyParser.json());
 
 app.use((req, res, next) => {
@@ -24,6 +25,7 @@ app.use((req, res, next) => {
 app.use('/profile', profileRoutes);
 app.use('/room', roomRoutes);
 app.use('/task', taskRoutes);
+
 
 
 app.post('/signup', async (req, res) => {
@@ -75,6 +77,8 @@ app.post('/login', async (req, res) => {
         res.send("Error: ", error)
     }
 })
+
+
 
 
 mongoose.connect('mongodb://127.0.0.1:27017/RoomEase', { useUnifiedTopology: true, useNewUrlParser: true }, () => {

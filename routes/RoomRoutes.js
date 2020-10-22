@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const RoomModel = require('../models/RoomModel');
+const FeedModel = require('../models/FeedModel');
 const User = require('../models/User');
+const Constants = require("../contants");
 
 //input : Roomname and userid
 router.post('/create', async (req, res, next) => {
@@ -19,12 +21,17 @@ router.post('/create', async (req, res, next) => {
 
             if (user && user.roomid == null) {
                 let roomModel = new RoomModel({ roomName: roomName });
+
+
                 roomModel['members'].push(userID);
 
                 user.roomid = roomModel._id;
 
                 await roomModel.save();
                 await user.save();
+
+                let feedModel = new FeedModel({ roomID: roomModel._id, feed: [{ createdOn: Constants.getTodaysDate(), message: `Room Created ${roomName}` }] })
+                feedModel.save();
 
                 responseObject['Result'] = 'Success';
                 responseObject['Error'] = null;
@@ -72,6 +79,8 @@ router.post('/join', async (req, res, next) => {
 
             responseObject['Result'] = "Success";
             responseObject['Error'] = null;
+
+            Constants.addToFeed(room._id, `${user.userName} joined the room `)
         }
         else
             responseObject['Error'] = "User already exists in room";
@@ -101,6 +110,9 @@ router.post('/leave', async (req, res, next) => {
 
             await room.save();
             await user.save();
+
+            let userName = (await User.findById(userID)).userName;
+            Constants.addToFeed(room._id, `${userName} left the room`);
 
             responseObject['Result'] = "Success";
             responseObject['Error'] = null;
@@ -140,15 +152,39 @@ router.get('/members', async (req, res, next) => {
 router.get('/tasks', async (req, res, next) => {
     const responseObject = { "Result": "Fail", Error: "Room not found" }
     let roomName = req.query.roomname;
+    let retObj = {};
 
-    let room = (await RoomModel.find({ roomName: roomName }))[0];
+    let room = (await RoomModel.find({ roomName: roomName }).select("roomName tasks").populate("tasks").populate("columns.users"))[0];
     if (room) {
+        let tasks = [...room['tasks']];
+        for (let i = 0; i < tasks.length; i++) {
+            let users = await User.find().where('_id').in(tasks[i].columns.users).select("userName");
+            tasks[i].columns.users = users;
+        }
+
+        retObj['roomName'] = room['roomName'];
+        retObj['tasks'] = tasks;
+
         responseObject['Result'] = "Success";
         responseObject['Error'] = null;
-        responseObject['Tasks'] = [...room['tasks']];
     }
 
+    res.send({ responseObject, retObj })
+})
+
+//Input is roomname as query
+router.get('/feed', async (req, res, next) => {
+    const responseObject = { "Result": "Fail", Error: "Room not found" }
+
+    let roomName = req.query.roomname;
+    let room = (await RoomModel.find({ roomName: roomName }))[0];
+    let feedModel = (await FeedModel.find({ roomID: room._id }))[0];
+
+    responseObject['Feed'] = feedModel.feed
+    responseObject['Error'] = null;
+    responseObject['Result'] = "Success"
     res.send(responseObject)
+
 })
 
 
