@@ -5,10 +5,11 @@ var profileRoutes = require('./routes/ProfileRoutes');
 var roomRoutes = require('./routes/RoomRoutes');
 var taskRoutes = require('./routes/TaskRoutes');
 const User = require('./models/User');
-var path = require('path')
-
-
+const RoomModel = require('./models/RoomModel');
 const app = express();
+var http = require('http').createServer(app);
+var io = require('socket.io')(http);
+
 app.use(express.static('public'));
 app.use(bodyParser.json());
 
@@ -80,9 +81,65 @@ app.post('/login', async (req, res) => {
 
 
 
+var chatData = {};
+
+io.on('connection', async (socket) => {
+
+    console.log("Connected with id ", socket.id);
+
+    let roomName = socket.handshake.query.room;
+    let userID = socket.handshake.query.userid;
+    let userName = (await User.findById(userID)).userName;
+
+    chatData[userID] = {
+        room: roomName,
+        socketID: socket.id,
+        userName: userName
+    }
+
+    socket.join(roomName);
+
+    socket.on('message', async (data) => {
+        let { message, room, id } = data;
+
+        let messageData = {};
+        messageData['sender'] = chatData[userID].userName;
+        messageData['text'] = message;
+        messageData['messageTime'] = new Date().getHours() + ":" + new Date().getMinutes();
+        messageData['messageID'] = Date.now().toString(36) + Math.random().toString(36).substr(0);
+
+        let rooms = (await RoomModel.find({ roomName: room }))[0];
+        let chat = rooms.chat;
+        chat.push(messageData);
+        rooms.chat = chat;
+        rooms.save();
+
+        io.to(room).emit('chatMessage', messageData)
+    })
+
+    socket.on('typing', async (data) => {
+        let sender = chatData[userID].userName;
+        data.message = `${sender} in typing...`
+        io.to(data.room).emit('promptMessage', data);
+    })
+
+    socket.on('stop_typing', async (data) => {
+        data.message = "";
+        io.to(data.room).emit('promptMessage', data)
+    })
+
+    socket.on('disconnect', () => {
+        // console.log("Disconnected ", socket.id);
+        // io.to(roomName).emit('roomMessage', `${chatData[userID].userName} Left THE ROOM`)
+        delete chatData[socket.id];
+    })
+
+
+})
+
 
 mongoose.connect('mongodb://127.0.0.1:27017/RoomEase', { useUnifiedTopology: true, useNewUrlParser: true }, () => {
-    app.listen(8080, () => {
+    http.listen(8080, () => {
         console.log("Server started on 8080");
     })
 })

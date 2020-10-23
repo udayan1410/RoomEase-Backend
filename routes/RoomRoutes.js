@@ -187,6 +187,18 @@ router.get('/feed', async (req, res, next) => {
 
 })
 
+//Input is roomname as query
+router.get('/chat', async (req, res, next) => {
+    const responseObject = { "Result": "Success", Error: null }
+
+    let roomName = req.query.roomname;
+    let room = (await RoomModel.find({ roomName: roomName }))[0];
+
+    let chat = room.chat;
+
+    responseObject['Chat'] = chat;
+    res.send(responseObject)
+})
 
 
 module.exports = router;
