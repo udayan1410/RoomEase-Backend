@@ -51,7 +51,7 @@ router.get('/', async (req, res, next) => {
 */
 
 // input - user ID and oldpassword, 
-// output- true if pw is changed, false otherwise.
+// output- Result = success if pw is changed, fail otherwise.
 
 router.put('/changePassword', async (req,res,next)=> {
     let body = {...req.body};
@@ -60,10 +60,10 @@ router.put('/changePassword', async (req,res,next)=> {
         let flag = (await User.find({ _id: body.id, password: body.oldpassword  }))[0];
             if(flag){
                 await User.updateOne({_id : body.id}, {$set: { "password" : body.newpassword}});
-                res.send(true);
+                res.send({"Result": "Success"});
             }
             else 
-                res.send(false);   
+                res.send({"Result": "Fail"});   
     }
     catch(err){
         res.send(err);   
