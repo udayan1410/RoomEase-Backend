@@ -40,38 +40,6 @@ router.get('/', async (req, res, next) => {
 })
 
 
-/*  to get the user details (uname, email, phonenumber) (for gg Oct 25) eg (for gg):
-    do localhost:8080/profile/user
-    and in body you can write - {"id":"5f7660251762087a00e95534"}
-*/
-// input-   user id 
-// output-  {
-//     "Result": "Success",
-//     "Error": null,
-//     "userName": "kdshah",
-//     "email": "kshah@gmail.com",
-//     "phoneNumber": "123"
-// }
-
-router.get('/user', async (req, res, next) => {
-    let responseObject = { "Result": "Fail", Error: "User not found" }
-    try{
-        let userInfo = (await User.find({_id:({...req.body}).id }).select("userName email phoneNumber"))[0];
-        if(userInfo){
-            responseObject["Result"] = "Success";
-            responseObject["Error"] = null;
-            responseObject["userName"] = userInfo.userName;
-            responseObject["email"] = userInfo.email;
-            responseObject["phoneNumber"] = userInfo.phoneNumber;
-        }
-        res.send(responseObject);
-    }
-    catch(err){
-        responseObject["Error"] = err;
-        res.send(responseObject);
-    }
-})
-
 
 /* to change the password of the given user eg: 
    do put- localhost:8080/profile/changePassword 
