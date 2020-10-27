@@ -14,7 +14,9 @@ const roomSchema = (
 
         tasks: [{
             type: Schema.Types.ObjectId, ref: 'TaskModel'
-        }]
+        }],
+
+        chat: [],
 
     }
 )

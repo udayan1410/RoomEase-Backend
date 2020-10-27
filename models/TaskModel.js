@@ -21,7 +21,9 @@ const taskmodel = (
 
         createdOn: {
             type: String,
-        }
+        },
+
+        color: String
     }
 )
 
