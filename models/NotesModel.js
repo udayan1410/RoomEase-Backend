@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const roomSchema = (
+const NotesModel = (
     {
         roomId: {
             type: Schema.Types.ObjectId,
@@ -10,7 +10,8 @@ const roomSchema = (
         },
 
         createdBy: {
-            type: Schema.Types.ObjectId, ref: 'User'
+            type: Schema.Types.ObjectId, 
+            ref: 'User'
         },
 
         title: {
@@ -27,9 +28,13 @@ const roomSchema = (
         },
         createdOn: {
             type: Date,
+        },
+        roomName: {
+            type: String,
+            ref: 'RoomModel'
         }
 
     }
 )
 
-module.exports = mongoose.model('NotesModel', notesmodel);
+module.exports = mongoose.model('NotesModel', NotesModel);
