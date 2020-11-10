@@ -4,8 +4,12 @@ var mongoose = require('mongoose');
 var profileRoutes = require('./routes/ProfileRoutes');
 var roomRoutes = require('./routes/RoomRoutes');
 var taskRoutes = require('./routes/TaskRoutes');
+var notesRoutes = require('./routes/NotesRoutes');
+
 const User = require('./models/User');
 const RoomModel = require('./models/RoomModel');
+const NotesModel = require('./models/NotesModel');
+
 const app = express();
 var http = require('http').createServer(app);
 var io = require('socket.io')(http);
@@ -24,6 +28,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/profile', profileRoutes);
+app.use('/notes', notesRoutes);
 app.use('/room', roomRoutes);
 app.use('/task', taskRoutes);
 
