@@ -3,12 +3,6 @@ const Schema = mongoose.Schema;
 
 const NotesModel = (
     {
-        roomId: {
-            type: Schema.Types.ObjectId,
-            required: true,
-            ref: 'RoomModel'
-        },
-
         createdBy: {
             type: Schema.Types.ObjectId, 
             ref: 'User'
