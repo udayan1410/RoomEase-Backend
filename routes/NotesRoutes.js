@@ -72,7 +72,7 @@ router.get('/roomnotes', async (req, res, next) => {
     
     try{
         let {roomname} = req.query;
-        let notes = await NotesModel.find( {roomName:roomname} );
+        let notes = await NotesModel.find( {roomName:roomname, shared:true} );
 
         if (notes) {
             responseObject["Result"] = "Success";
