@@ -1,6 +1,8 @@
 const FeedModel = require('./models/FeedModel');
+const User = require('./models/User');
 
 let ASSIGNED = "ASSIGNED";
+let FIXED_VALUE_CONSTANTS = 2;
 
 let getRandomColor = () => parseInt(Math.random() * 256)
 
@@ -30,9 +32,32 @@ let addToFeed = async (roomID, feedString) => {
 }
 
 
+let addToExpenseFeed = async (id, feedString, subheading, value, expenseID) => {
+
+    let user = await User.findById(id);
+    let userFeed = user.splitEase.feed;
+
+    let feedObject = {
+        expenseID: expenseID,
+        description: feedString,
+        subheading: subheading,
+        value: value,
+        date: getTodaysDate()
+    }
+
+    userFeed.unshift(feedObject);
+
+    user.splitEase.feed = userFeed;
+
+    await user.save();
+
+}
+
 module.exports = {
     ASSIGNED, ASSIGNED,
     getRandomColor: getRandomColor,
     getTodaysDate: getTodaysDate,
     addToFeed: addToFeed,
+    addToExpenseFeed: addToExpenseFeed,
+    FIXED_VALUE_CONSTANTS: FIXED_VALUE_CONSTANTS,
 }
