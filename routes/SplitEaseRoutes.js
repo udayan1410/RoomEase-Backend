@@ -129,7 +129,7 @@ router.post("/settleup", async (req, res, next) => {
         let toUserExpenses = toModel.splitEase.expenses;
         toUserExpenses.unshift(paybackExpenseID);
         toModel.splitEase.expenses = toUserExpenses;
-        (await toModel.updateOne());
+        (await toModel.save());
 
         let fromModel = (await User.findById(from));
         let fromUserExpenses = fromModel.splitEase.expenses;
