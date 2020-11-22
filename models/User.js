@@ -33,6 +33,29 @@ const userSchema = (
             type: Schema.Types.ObjectId, ref: 'NotesModel',
         }],
 
+
+        splitEase: {
+            feed: [{
+                description: {
+                    type: String
+                },
+                subheading: {
+                    type: String
+                },
+                value: {
+                    type: Number
+                },
+                date: {
+                    type: String
+                },
+                expenseID: {
+                    type: Schema.Types.ObjectId, ref: 'SplitEase',
+                }
+            }],
+            expenses: [
+                { type: Schema.Types.ObjectId, ref: 'SplitEase', }
+            ]
+        }
     }
 );
 module.exports = mongoose.model('User', userSchema);

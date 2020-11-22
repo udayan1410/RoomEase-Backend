@@ -12,8 +12,8 @@ const RoomModel = require('../models/RoomModel')
 router.get('/', async (req, res, next) => {
 
     let responseObject = { "Result": "Fail", Error: "Room / user not found" }
-    try{
-        let { userID  , roomName } = req.query;
+    try {
+        let { userID, roomName } = req.query;
         let uInfo = (await User.find({ _id: userID }))[0];
         let room = (await RoomModel.find({ roomName: roomName }))[0];
 
@@ -23,20 +23,20 @@ router.get('/', async (req, res, next) => {
             let users = (await User.find().where('_id').in(memberIds).select("userName email roomid phoneNumber"));
 
             responseObject = {
-                'Result'   :  "Success",
-                'userInfo' : uInfo,
-                'Error' : null,
-                'Members' : [...users]
+                'Result': "Success",
+                'userInfo': uInfo,
+                'Error': null,
+                'Members': [...users]
             }
-            
+
         }
     }
-    catch(err){
+    catch (err) {
         console.log(err);
-        responseObject['Error'] = responseObject["Error"]+" "+err;
+        responseObject['Error'] = responseObject["Error"] + " " + err;
     }
     res.send(responseObject);
-    
+
 })
 
 
@@ -53,20 +53,20 @@ router.get('/', async (req, res, next) => {
 // input - user ID and oldpassword, 
 // output- Result = success if pw is changed, fail otherwise.
 
-router.put('/changePassword', async (req,res,next)=> {
-    let body = {...req.body};
-    
-    try{
-        let flag = (await User.find({ _id: body.id, password: body.oldpassword  }))[0];
-            if(flag){
-                await User.updateOne({_id : body.id}, {$set: { "password" : body.newpassword}});
-                res.send({"Result": "Success"});
-            }
-            else 
-                res.send({"Result": "Fail"});   
+router.put('/changePassword', async (req, res, next) => {
+    let body = { ...req.body };
+
+    try {
+        let flag = (await User.find({ _id: body.id, password: body.oldpassword }))[0];
+        if (flag) {
+            await User.updateOne({ _id: body.id }, { $set: { "password": body.newpassword } });
+            res.send({ "Result": "Success" });
+        }
+        else
+            res.send({ "Result": "Fail" });
     }
-    catch(err){
-        res.send(err);   
+    catch (err) {
+        res.send(err);
     }
 })
 

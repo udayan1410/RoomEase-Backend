@@ -4,7 +4,10 @@ var mongoose = require('mongoose');
 var profileRoutes = require('./routes/ProfileRoutes');
 var roomRoutes = require('./routes/RoomRoutes');
 var taskRoutes = require('./routes/TaskRoutes');
+
 var notesRoutes = require('./routes/NotesRoutes');
+
+var splitEaseRoutes = require('./routes/SplitEaseRoutes');
 
 const User = require('./models/User');
 const RoomModel = require('./models/RoomModel');
@@ -31,6 +34,7 @@ app.use('/profile', profileRoutes);
 app.use('/notes', notesRoutes);
 app.use('/room', roomRoutes);
 app.use('/task', taskRoutes);
+app.use('/splitease', splitEaseRoutes);
 
 
 
@@ -85,12 +89,9 @@ app.post('/login', async (req, res) => {
 })
 
 
-
 var chatData = {};
 
 io.on('connection', async (socket) => {
-
-    console.log("Connected with id ", socket.id);
 
     let roomName = socket.handshake.query.room;
     let userID = socket.handshake.query.userid;
