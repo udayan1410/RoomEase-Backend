@@ -18,6 +18,9 @@ const roomSchema = (
 
         chat: [],
 
+        notes: [{
+            type: Schema.Types.ObjectId, ref: 'NotesModel',
+        }],
     }
 )
 

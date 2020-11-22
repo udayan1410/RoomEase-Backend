@@ -29,6 +29,11 @@ const userSchema = (
             type: Schema.Types.ObjectId, ref: 'TaskModel',
         }],
 
+        notes: [{
+            type: Schema.Types.ObjectId, ref: 'NotesModel',
+        }],
+
+
         splitEase: {
             feed: [{
                 description: {
