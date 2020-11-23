@@ -145,7 +145,7 @@ io.on('connection', async (socket) => {
 
 
 mongoose.connect('mongodb://127.0.0.1:27017/RoomEase', { useUnifiedTopology: true, useNewUrlParser: true }, () => {
-    http.listen(8080, () => {
+    http.listen(process.env.PORT, () => {
         console.log("Server started on 8080");
     })
 })
