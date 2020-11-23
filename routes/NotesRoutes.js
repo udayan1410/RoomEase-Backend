@@ -15,17 +15,18 @@ router.post('/create', async (req, res, next) => {
     try {
         let { userID, roomName, noteTitle, body, shared } = req.body;
         let createdOn = Constants.getTodaysDate();
-        if(shared==null) shared = false;
+        if (shared == null) shared = false;
         let room = null;
         let user = (await User.findById(userID));
-        if(roomName != null) {
+        if (roomName != null) {
             room = (await RoomModel.find({ roomName: roomName }))[0];
             if (user) {
-                let notes = new NotesModel({roomId: user.roomid, createdOn: createdOn, 
+                let notes = new NotesModel({
+                    roomId: user.roomid, createdOn: createdOn,
                     title: noteTitle, shared: shared, body: body, createdBy: userID, roomName: roomName
                 });
                 user.notes.push(notes._id);
-                if(shared === true ){
+                if (shared === true) {
                     room.notes.push(notes._id);
                     await room.save();
                 }
@@ -33,7 +34,7 @@ router.post('/create', async (req, res, next) => {
                 await notes.save();
                 responseObject['Result'] = 'Success';
                 responseObject['Error'] = null;
-                responseObject['notesData'] = notes;                
+                responseObject['notesData'] = notes;
             }
             else {
                 responseObject['Result'] = 'Fail';
@@ -48,7 +49,7 @@ router.post('/create', async (req, res, next) => {
                 await notes.save();
                 responseObject['Result'] = 'Success';
                 responseObject['Error'] = null;
-                responseObject['notesData'] = notes;                
+                responseObject['notesData'] = notes;
             }
             else {
                 responseObject['Result'] = 'Fail';
@@ -69,10 +70,10 @@ router.post('/create', async (req, res, next) => {
 router.get('/roomnotes', async (req, res, next) => {
 
     const responseObject = { "Result": "Fail", "err": "Error" }
-    
-    try{
-        let {roomname} = req.query;
-        let notes = await NotesModel.find( {roomName:roomname, shared:true} );
+
+    try {
+        let { roomname } = req.query;
+        let notes = await NotesModel.find({ roomName: roomname, shared: true });
 
         if (notes) {
             responseObject["Result"] = "Success";
@@ -81,7 +82,7 @@ router.get('/roomnotes', async (req, res, next) => {
         }
         res.send(responseObject)
     }
-    catch(err){
+    catch (err) {
         responseObject.Error = err;
         res.send(responseObject)
     }
@@ -91,9 +92,9 @@ router.get('/roomnotes', async (req, res, next) => {
 router.get('/selfnotes', async (req, res, next) => {
 
     const responseObject = { "Result": "Fail", "err": "Error" }
-    try{    
-        let {userID} = req.query;
-        let notes = await NotesModel.find( {createdBy : userID} );
+    try {
+        let { userID } = req.query;
+        let notes = await NotesModel.find({ createdBy: userID });
 
         if (notes) {
             responseObject["Result"] = "Success";
@@ -102,7 +103,7 @@ router.get('/selfnotes', async (req, res, next) => {
         }
         res.send(responseObject)
     }
-    catch(err){
+    catch (err) {
         responseObject.Error = err;
         res.send(responseObject);
     }
@@ -111,9 +112,9 @@ router.get('/selfnotes', async (req, res, next) => {
 // input = request query = noteid.
 router.get('/', async (req, res, next) => {
     const responseObject = { "Result": "Fail", "err": "Error" }
-    try{
-        let {noteid} = req.query;
-        let notes = await NotesModel.find( {_id : noteid} );
+    try {
+        let { noteid } = req.query;
+        let notes = await NotesModel.find({ _id: noteid });
         if (notes) {
             responseObject["Result"] = "Success";
             responseObject["Error"] = null;
@@ -121,49 +122,49 @@ router.get('/', async (req, res, next) => {
         }
         res.send(responseObject)
     }
-    catch(err){
+    catch (err) {
         responseObject["Error"] = err;
         res.send(responseObject);
     }
 })
 
 // input: shared, _id, createdOn, title, body, createdBy, userid
-router.patch('/', async (req,res,next) => {
-    const responseObject = {"Result": "Fail", "err": "Unknown Error"};
-    try{
-        let {shared, _id, createdOn, title, body, createdBy, userID } = req.body;
+router.patch('/', async (req, res, next) => {
+    const responseObject = { "Result": "Fail", "err": "Unknown Error" };
+    try {
+        let { shared, _id, createdOn, title, body, createdBy, userID } = req.body;
         let note = await NotesModel.findById(_id);
         let user = await User.findById(userID);
-        if(user.roomid == null){
+        if (user.roomid == null) {
             shared = false;
-            if(note){
+            if (note) {
                 await NotesModel.findByIdAndUpdate(_id, { shared, createdOn, title, body, createdBy })
-                responseObject['notes'] = ( await NotesModel.findById(_id) );
+                responseObject['notes'] = (await NotesModel.findById(_id));
                 responseObject['Error'] = null;
                 responseObject['Result'] = "Success";
             }
         }
-        else{
+        else {
             let room = await RoomModel.findById(user.roomid);
-            if(user && room && note){
-                if(!note.shared && shared){
+            if (user && room && note) {
+                if (!note.shared && shared) {
                     room.notes.push(note._id);
                     await room.save();
                 }
-                else if(note.shared && !shared){
-                    room.notes.splice(room.notes.indexOf(note._id),1);
+                else if (note.shared && !shared) {
+                    room.notes.splice(room.notes.indexOf(note._id), 1);
                     await room.save();
                 }
                 await NotesModel.findByIdAndUpdate(_id, { shared, createdOn, title, body, createdBy, roomName: room.roomName })
-                responseObject['notes'] = ( await NotesModel.findById(_id) );
+                responseObject['notes'] = (await NotesModel.findById(_id));
                 responseObject['Error'] = null;
                 responseObject['Result'] = "Success";
             }
         }
-        
+
         res.send(responseObject);
     }
-    catch(err){
+    catch (err) {
         responseObject.Error = err;
         res.send(responseObject);
     }
@@ -171,41 +172,40 @@ router.patch('/', async (req,res,next) => {
 
 // input: {_id, createdBy, roomName, userID, shared
 router.delete('/', async (req, res, next) => {
-    const responseObject = {"Result": "Fail", "err": "Cannot delete. (no user / note found)"};
+    const responseObject = { "Result": "Fail", "err": "Cannot delete. (no user / note found)" };
     try {
-      let { noteid, userID } = req.query;
-      let user = await User.findById(userID);
-      let note = await NotesModel.findById(noteid);
-      if (note.createdBy != userID) {
-        responseObject["Error"] =
-          "Cannot delete, the current user is not the owner of the note.";
-        res.send(responseObject);
-      } 
-      else {
-        if (user) {
-          if (user.roomid != null) {
-            let room = await RoomModel.findById(user.roomid);
-            console.log(room);
-            let room_notes = room.notes;
-            if (room_notes.includes(noteid))
-              room_notes.splice(room_notes.indexOf(noteid), 1);
-            room.save();
-          }
-          let user_notes = user.notes;
-          if (user_notes.includes(noteid))
-            user_notes.splice(user_notes.indexOf(noteid), 1);
-          user.save();
+        let { noteid, userID } = req.query;
+        let user = await User.findById(userID);
+        let note = await NotesModel.findById(noteid);
+        if (note.createdBy != userID) {
+            responseObject["Error"] =
+                "Cannot delete, the current user is not the owner of the note.";
+            res.send(responseObject);
         }
+        else {
+            if (user) {
+                if (user.roomid != null) {
+                    let room = await RoomModel.findById(user.roomid);
+                    let room_notes = room.notes;
+                    if (room_notes.includes(noteid))
+                        room_notes.splice(room_notes.indexOf(noteid), 1);
+                    room.save();
+                }
+                let user_notes = user.notes;
+                if (user_notes.includes(noteid))
+                    user_notes.splice(user_notes.indexOf(noteid), 1);
+                user.save();
+            }
 
-        let del = await NotesModel.deleteOne({ _id: noteid });
-        if (del.deletedCount > 0) {
-          responseObject["Result"] = "Success";
-          responseObject["Error"] = null;
+            let del = await NotesModel.deleteOne({ _id: noteid });
+            if (del.deletedCount > 0) {
+                responseObject["Result"] = "Success";
+                responseObject["Error"] = null;
+            }
+            res.send(responseObject);
         }
-        res.send(responseObject);
-      }
     }
-    catch (err){
+    catch (err) {
         responseObject.Error = err;
         res.send(responseObject);
     }
