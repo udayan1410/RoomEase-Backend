@@ -45,7 +45,7 @@ router.post('/create', async (req, res, next) => {
 
         let userName = (await User.findById(userID)).userName;
 
-        Constants.addToFeed(room._id, `Task Created ${task.taskName} by ${userName}`);
+        Constants.addToFeed(room._id, `Task Created "${task.taskName}" by "${userName}"`);
 
         responseObject['Error'] = null;
         responseObject['Result'] = "Success"
@@ -148,7 +148,7 @@ router.patch('/', async (req, res, next) => {
     let roomID = (await RoomModel.find({ roomName: roomName }))[0]._id;
     let userName = (await User.findById(userID)).userName;
 
-    Constants.addToFeed(roomID, `Task Updated ${taskName} by ${userName}`)
+    Constants.addToFeed(roomID, `Task Updated  "${taskName}" by "${userName}"`)
 
     res.send(responseObject);
 })
@@ -188,7 +188,7 @@ router.delete('/', async (req, res, next) => {
         responseObject['Error'] = null;
         responseObject['Result'] = "Successs";
 
-        Constants.addToFeed(room._id, `Task Deleted ${taskName}`)
+        Constants.addToFeed(room._id, `Task Deleted "${taskName}"`)
     }
 
     res.send(responseObject);

@@ -145,10 +145,12 @@ io.on('connection', async (socket) => {
 
 
 let mongoDBURL = "mongodb+srv://root:root@roomeasedb.74gl7.mongodb.net/RoomEase";
-let mongoDBLocalURL = "mongodb://127.0.0.1:27017/RoomEase";
+// let mongoDBURL = "mongodb://127.0.0.1:27017/RoomEase";
+let port = process.env.PORT;
+// let port = 8080
 
 mongoose.connect(mongoDBURL, { useUnifiedTopology: true, useNewUrlParser: true }, () => {
-    http.listen(process.env.PORT, () => {
+    http.listen(port, () => {
         console.log("Server started on 8080");
     })
 })

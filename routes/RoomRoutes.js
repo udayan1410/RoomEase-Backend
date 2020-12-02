@@ -83,7 +83,7 @@ router.post('/leave', async (req, res, next) => {
             await user.save();
 
             let userName = (await User.findById(userID)).userName;
-            Constants.addToFeed(room._id, `${userName} left the room`);
+            Constants.addToFeed(room._id, `"${userName}" left the room`);
 
             responseObject['Result'] = "Success";
             responseObject['Error'] = null;
@@ -210,7 +210,7 @@ let userAddToRoom = async (body) => {
             responseObject['Result'] = "Success";
             responseObject['Error'] = null;
 
-            Constants.addToFeed(room._id, `${user.userName} joined the room `)
+            Constants.addToFeed(room._id, `"${user.userName}" joined the room `)
         }
         else
             responseObject['Error'] = "User already exists in room";

@@ -172,11 +172,13 @@ router.patch('/', async (req, res, next) => {
 
 // input: {_id, createdBy, roomName, userID, shared
 router.delete('/', async (req, res, next) => {
-    const responseObject = { "Result": "Fail", "err": "Cannot delete. (no user / note found)" };
+    const responseObject = { "Result": "Fail", "Error": "Cannot delete. (no user / note found)" };
     try {
         let { noteid, userID } = req.query;
         let user = await User.findById(userID);
         let note = await NotesModel.findById(noteid);
+
+
         if (note.createdBy != userID) {
             responseObject["Error"] =
                 "Cannot delete, the current user is not the owner of the note.";
