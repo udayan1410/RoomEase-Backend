@@ -108,10 +108,18 @@ io.on('connection', async (socket) => {
     socket.on('message', async (data) => {
         let { message, room, id } = data;
 
+        let hours = `${new Date().getHours()}`;
+        let minutes = `${new Date().getMinutes()}`;
+
+        if (minutes.length === 1)
+            minutes = "0" + minutes;
+
+        let messageTime = `${hours} : ${minutes}`
+
         let messageData = {};
         messageData['sender'] = chatData[userID].userName;
         messageData['text'] = message;
-        messageData['messageTime'] = new Date().getHours() + ":" + new Date().getMinutes();
+        messageData['messageTime'] = messageTime
         messageData['messageID'] = Date.now().toString(36) + Math.random().toString(36).substr(0);
 
         let rooms = (await RoomModel.find({ roomName: room }))[0];
