@@ -160,8 +160,17 @@ router.get("/getExpenses", async (req, res, next) => {
     let { userID } = req.query;
     let balanceMapObj = await constructBalanceMap(userID);
 
+
+    let balanceMapData = balanceMapObj.data;
+    for (let data in balanceMapData)
+        balanceMapData[data]['balance'] = balanceMapData[data]['balance'].toFixed(Constants.FIXED_VALUE_CONSTANTS);
+
+    balanceMapObj.data = balanceMapData
+
     responseObject.balanceMap = balanceMapObj.data;
     responseObject.totalBalance = balanceMapObj.totalBalance;
+
+
 
     res.send(responseObject)
 })
@@ -174,12 +183,20 @@ router.get("/getExpenseFeed", async (req, res, next) => {
 
     let { userID } = req.query;
 
+
     let userModel = (await User.findById(userID));
     let userFeed = userModel.splitEase.feed;
 
-    // let balanceMapObj = (await constructBalanceMap(userID));
-    // responseObject.totalBalance = balanceMapObj.totalBalance;
+    userModel.splitEase.feed = userModel.splitEase.feed.map(feedModel => {
+        return {
+            ...feedModel,
+            value: feedModel.value.toFixed(Constants.FIXED_VALUE_CONSTANTS)
+        }
+    })
+
+
     responseObject.feed = userFeed;
+
 
     res.send(responseObject)
 });
@@ -240,6 +257,7 @@ let constructBalanceMap = async (userID) => {
                     expenseID: splitModel._id
                 };
             }
+
             balanceMap[person._id]['balance'] += splitModel.eachContribution;
         }
     }
